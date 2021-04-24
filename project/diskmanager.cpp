@@ -1,5 +1,9 @@
 #include "disk.h"
 #include "diskmanager.h"
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
 using namespace std;
 
 //use this to read integers out of buffer

@@ -49,6 +49,75 @@ int RecordManagement::getaddrs(char* inodeBuf) {
 	return x;
 };
 
+//return -1 if works
+//return 0 if works
+//this assumes that all files are len 1
+int RecordManagement::rollbackRoot(char* recordname, int rnameLen) {
+
+	char rname = recordname[rnameLen - 1];
+	char rootbuf[64];
+	char tempbuf[64];
+	for (int j = 0; j < 64; j++) rootbuf[j] = '#';
+	for (int j = 0; j < 64; j++) tempbuf[j] = '#';
+	int tbufpos = 0;
+	int tbufpos2;
+	int overflowblock = GrootDirAddr;
+	bool done = false;
+	int r;
+	r = myDM->readDiskBlock(myrecordManagementName, GrootDirAddr, rootbuf); //get the buffer of the subdir
+	int bufpos = 0;
+
+	while (true) {//loop starting at subdir, and go through all the way
+		if (rootbuf[bufpos] == '#') {
+			r = myPM->writeDiskBlock(overflowblock, tempbuf);
+			return 0;
+		}
+		if (done == false) {
+			if (rootbuf[bufpos] == rname && rootbuf[bufpos + 5] == 'F') {//you have found the file
+				done = true;
+			}
+		}
+		if (bufpos < 60) {
+			if (rootbuf[bufpos] != recordname[rnameLen - 1]) {
+				tbufpos2 = bufpos;
+				for (int q = 0; q < 6; q++) {
+					tempbuf[tbufpos] = rootbuf[tbufpos2];
+					tbufpos++;
+					tbufpos2++;
+				}
+			}
+		}
+		if (bufpos >= 60) {//need to replace GrootDir with addr there 
+			tbufpos2 = bufpos;
+			for (int q = 0; q < 4; q++) {
+				tempbuf[tbufpos2] = rootbuf[tbufpos2];
+				tbufpos2++;
+			}
+			int xy = myDM->charToInt(bufpos, rootbuf);
+			r = myDM->readDiskBlock(myrecordManagementName, xy, rootbuf);
+			if (done == true) {
+				tbufpos = 54;
+				for (int q = 0; q < 6; q++) {
+					tempbuf[tbufpos] = rootbuf[q];
+					tbufpos++;
+				}
+			}
+			r = myPM->writeDiskBlock(overflowblock, tempbuf);
+			overflowblock = xy;
+			for (int j = 0; j < 64; j++) tempbuf[j] = '#';
+			if (done == true) {
+				bufpos = 6;
+			}
+			else
+			{
+				bufpos = 0;
+			}
+			tbufpos = 0;
+		}
+		else bufpos += 6;
+	}
+}
+
 //-1 if DNE
 //-2 if Dir already there
 //record block addr if found

@@ -42,7 +42,7 @@ int Disk::copyDiskrecord()
     if (!currf || !copyf) return (-1);
     copyf << currf.rdbuf();
     currf.close();
-    copyf.close() :
+    copyf.close();
     return(0);
 }
 
