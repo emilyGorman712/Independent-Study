@@ -1,5 +1,5 @@
 
-/* A driver to test the filesystem */
+/* This is an example of a driver to test the filesystem */
 
 #include <iostream>
 #include <fstream>
@@ -7,7 +7,7 @@
 #include "disk.h"
 #include "diskmanager.h"
 #include "partitionmanager.h"
-#include "recordmanagement.h"
+#include "filesystem.h"
 #include "client.h"
 using namespace std;
 
@@ -24,22 +24,22 @@ int main()
 	dp[2].partitionSize = 105;
 
 	DiskManager* dm = new DiskManager(d, 3, dp);
-	RecordManagement* rm1 = new RecordManagement(dm, 'A');
-	RecordManagement* rm2 = new RecordManagement(dm, 'B');
-	RecordManagement* rm3 = new RecordManagement(dm, 'C');
-	Client* c1 = new Client(rm1);
-	Client* c2 = new Client(rm1);
-	Client* c3 = new Client(rm1);
-	Client* c4 = new Client(rm2);
-	Client* c5 = new Client(rm2);
+	FileSystem* fs1 = new FileSystem(dm, 'A');
+	FileSystem* fs2 = new FileSystem(dm, 'B');
+	FileSystem* fs3 = new FileSystem(dm, 'C');
+	Client* c1 = new Client(fs1);
+	Client* c2 = new Client(fs1);
+	Client* c3 = new Client(fs1);
+	Client* c4 = new Client(fs2);
+	Client* c5 = new Client(fs2);
 
-	c1->myRM->createRecord(const_cast<char*>("/a"), 2);
-	c1->myRM->createRecord(const_cast<char*>("/b"), 2);
-	c2->myRM->createRecord(const_cast<char*>("/a"), 2);
-	c4->myRM->createRecord(const_cast<char*>("/a"), 2);
-	int fd = c2->myRM->openRecord(const_cast<char*>("/b"), 2, 'w', -1);
-	c2->myRM->writeRecord(fd, const_cast<char*>("aaaabbbbcccc"), 12);
-	c2->myRM->closeRecord(fd);
+	c1->myFS->createFile(const_cast<char*>("/a"), 2);
+	c1->myFS->createFile(const_cast<char*>("/b"), 2);
+	c2->myFS->createFile(const_cast<char*>("/a"), 2);
+	c4->myFS->createFile(const_cast<char*>("/a"), 2);
+	int fd = c2->myFS->openFile(const_cast<char*>("/b"), 2, 'w', -1);
+	c2->myFS->writeFile(fd, const_cast<char*>("aaaabbbbcccc"), 12);
+	c2->myFS->closeFile(fd);
 
 	return 0;
 }

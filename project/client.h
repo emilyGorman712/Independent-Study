@@ -1,5 +1,5 @@
 class Client {
 public:
-    RecordManagement* myRM;
-    Client(RecordManagement* fs) { myRM = fs; };
+    FileSystem* myFS;
+    Client(FileSystem* fs) { myFS = fs; };
 };

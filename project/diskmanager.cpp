@@ -31,7 +31,8 @@ void DiskManager::intToChar(int pos, int num, char* buff) {
 
 }
 
-DiskManager::DiskManager(Disk *d, int partcount, DiskPartition *dp)
+
+DiskManager::DiskManager(Disk* d, int partcount, DiskPartition* dp)
 {
     myDisk = d;
     partCount = partcount;
@@ -42,7 +43,7 @@ DiskManager::DiskManager(Disk *d, int partcount, DiskPartition *dp)
     r2 = myDisk->readDiskBlock(0, buffer);
 
     if (r == 1) {
-        cout << "no disk record found, creating new one... " << endl;
+        cout << "no disk file found, creating new one... " << endl;
         cout << "creating superblock..." << endl;
 
         diskP = dp;
@@ -50,11 +51,12 @@ DiskManager::DiskManager(Disk *d, int partcount, DiskPartition *dp)
         diskP = new DiskPartition[partCount];
     }
     else {
-        cout << "disk record found, checking superblock... " << endl;
+        cout << "disk file found, checking superblock... " << endl;
         diskP = dp;
         if (buffer[0] == '#') {
             cout << "no superblock found, creating superblock..." << endl;
             setSuperBlock();
+
         }
         else {
             cout << "superblock found, reading info from it..." << endl;
@@ -73,9 +75,17 @@ DiskManager::DiskManager(Disk *d, int partcount, DiskPartition *dp)
             } while (buffer[position] != '#');
         }
     }
+
 }
 
-int DiskManager::readDiskBlock(char partitionname, int blknum, char *blkdata)
+/*
+ *   returns:
+ *   0, if the block is successfully read;
+ *  -1, if disk can't be opened; (same as disk)
+ *  -2, if blknum is out of bounds; (same as disk)
+ *  -3 if partition doesn't exist
+ */
+int DiskManager::readDiskBlock(char partitionname, int blknum, char* blkdata)
 {
     // Return -3 if partition doesn't exist
     bool pExists = false;
@@ -89,6 +99,17 @@ int DiskManager::readDiskBlock(char partitionname, int blknum, char *blkdata)
     }
     if (pExists == false) return -3;
 
+    /*
+    // Return -2 if blknum is out of bounds
+    if ((blknum < sBlock[pos].pStart) || (blknum >= getPartitionSize(partitionname))) return -2;
+
+    // Return -1 if disk can't be opened
+    ifstream f(myDisk->diskFilename, ios::in);
+    if (!f) return -1;
+
+    // Disk can be accessed. Read from it. Close it. Return 0 when done.
+    */
+
     int diskpos = blknum + sBlock[pos].pStart;
 
     int retval = myDisk->readDiskBlock(diskpos, blkdata);
@@ -96,9 +117,17 @@ int DiskManager::readDiskBlock(char partitionname, int blknum, char *blkdata)
     return retval;
 }
 
-int DiskManager::writeDiskBlock(char partitionname, int blknum, char *blkdata)
+
+/*
+ *   returns:
+ *   0, if the block is successfully written;
+ *  -1, if disk can't be opened; (same as disk)
+ *  -2, if blknum is out of bounds;  (same as disk)
+ *  -3 if partition doesn't exist
+ */
+int DiskManager::writeDiskBlock(char partitionname, int blknum, char* blkdata)
 {
-    // Return -3 if partition doesn't exist
+      // Return -3 if partition doesn't exist
     bool pExists = false;
     int pos = 0;
     for (pos; pos < partCount; pos++) {
@@ -109,6 +138,17 @@ int DiskManager::writeDiskBlock(char partitionname, int blknum, char *blkdata)
     }
     if (pExists == false) return -3;
 
+    /*
+    // Return -2 if blknum is out of bounds
+    if ((blknum < sBlock[pos].pStart) || (blknum >= getPartitionSize(partitionname))) return -2;
+
+    // Return -1 if disk can't be opened
+    fstream f(myDisk->diskFilename, ios::in|ios::out);
+    if (!f) return -1;
+
+    // Disk can be accessed. Write to it. Close it. Return 0 when done.
+    */
+
     int diskpos = blknum + sBlock[pos].pStart;
 
     int retval = myDisk->writeDiskBlock(diskpos, blkdata);
@@ -116,6 +156,10 @@ int DiskManager::writeDiskBlock(char partitionname, int blknum, char *blkdata)
     return retval;
 }
 
+/*
+ * return size of partition
+ * -1 if partition doesn't exist.
+ */
 int DiskManager::getPartitionSize(char partitionname)
 {
     // Search the disk partitions. Return size of requested partition if found.
@@ -129,8 +173,9 @@ int DiskManager::getPartitionSize(char partitionname)
     return -1;
 }
 
+//helper functions
+
 void DiskManager::setSuperBlock() {
-    //the superblock object stores name, start, and end blocks. sblock is an array of superblock object, defined in diskmanager.h
     int starter = 1;
     char buffer[64];
     int r;

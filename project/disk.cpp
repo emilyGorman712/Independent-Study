@@ -11,7 +11,7 @@ Disk::Disk(int numblocks, char* rname)
     blkCount = numblocks;
     blkSize = 4096;
     diskSize = numblocks * blkSize;
-    currrecordname = strdup(rname);
+    currfilename = strdup(rname);
 }
 
 Disk::~Disk()
@@ -20,11 +20,11 @@ Disk::~Disk()
 
 int Disk::initDisk()
 {
-    fstream f(currrecordname, ios::in);
+    fstream f(currfilename, ios::in);
     if (!f) {
-        f.open(currrecordname, ios::out);
+        f.open(currfilename, ios::out);
         if (!f) {
-            cerr << "Error: Cannot create disk record" << endl;
+            cerr << "Error: Cannot create disk file" << endl;
             return(-1);
         }
         for (int i = 0; i < diskSize; i++) f.put('#');
@@ -35,10 +35,10 @@ int Disk::initDisk()
     return 0;
 }
 
-int Disk::copyDiskrecord()
+int Disk::copyDiskfile()
 {
-    ifstream currf(currrecordname, ios::in);
-    fstream copyf(copiedrecordname, ios::out);
+    ifstream currf(currfilename, ios::in);
+    fstream copyf(copiedfilename, ios::out);
     if (!currf || !copyf) return (-1);
     copyf << currf.rdbuf();
     currf.close();
@@ -54,8 +54,8 @@ int Disk::readDiskBlock(int blknum, char* blkdata)
 */
 {
     if ((blknum < 0) || (blknum >= blkCount)) return(-2);
-    ifstream currf(currrecordname, ios::in);
-    ifstream copyf(copiedrecordname, ios::in);
+    ifstream currf(currfilename, ios::in);
+    ifstream copyf(copiedfilename, ios::in);
     if (!currf || !copyf) return(-1);
     currf.seekg(blknum * blkSize);
     copyf.seekg(blknum * blkSize);
@@ -74,8 +74,8 @@ int Disk::writeDiskBlock(int blknum, char* blkdata)
 */
 {
     if ((blknum < 0) || (blknum >= blkCount)) return(-2);
-    fstream currf(currrecordname, ios::in | ios::out);
-    fstream copyf(copiedrecordname, ios::in | ios::out);
+    fstream currf(currfilename, ios::in | ios::out);
+    fstream copyf(copiedfilename, ios::in | ios::out);
     if (!currf || !copyf) return(-1);
     currf.seekg(blknum * blkSize);
     copyf.seekg(blknum * blkSize);
@@ -86,10 +86,10 @@ int Disk::writeDiskBlock(int blknum, char* blkdata)
     return(0);
 }
 
-int Disk::detectrecordError(int errcode, int blknum, char* blkdata)
+int Disk::detectfileError(int errcode, int blknum, char* blkdata)
 {
-    ifstream copyf(copiedrecordname, ios::in);
-    fstream currf(currrecordname, ios::in | ios::out);
+    ifstream copyf(copiedfilename, ios::in);
+    fstream currf(currfilename, ios::in | ios::out);
     if (errcode != 0) {
         copyf.seekg(blknum * blkSize);
         currf.seekg(blknum * blkSize);

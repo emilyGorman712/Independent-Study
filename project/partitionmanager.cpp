@@ -5,6 +5,19 @@
 #include <iostream>
 #include <unistd.h>
 using namespace std;
+void prtbv(unsigned int* bv, int length) {     //printing function, purely for testing
+
+    for (int i = 0; i < length; i++) {
+        if (*bv & (1 << i)) {
+            cout << "1";
+        }
+        else {
+            cout << "0";
+        }
+    }
+    cout << "\n";
+
+}
 
 PartitionManager::PartitionManager(DiskManager* dm, char partitionname, int partitionsize)
 {
@@ -24,7 +37,9 @@ PartitionManager::PartitionManager(DiskManager* dm, char partitionname, int part
         dmBV->setBit(0);                                           //first and second bits of vector are set, 1 is set for root dir
         dmBV->getBitVector((unsigned int*)tempbuffer);
         x = myDM->writeDiskBlock(myPartitionName, 0, tempbuffer);      //bit vector written to first block of partition
-
+        if (x != 0) {
+            cout << "Error" << endl;
+        }
     }
 }
 
@@ -37,6 +52,7 @@ PartitionManager::~PartitionManager()
  */
 int PartitionManager::getFreeDiskBlock()
 {
+    /* write the code for allocating a partition block */
     BitVector* inBV = new BitVector(myPartitionSize);     //bit vector to read in
     int x;
     char buffer[64];  //initialize the array with c's, so you don't get garbage memory in the array.
@@ -46,7 +62,6 @@ int PartitionManager::getFreeDiskBlock()
 
     myDM->readDiskBlock(myPartitionName, 0, buffer);       //reads in bit vector from first block in partition
     inBV->setBitVector((unsigned int*)buffer);
- 
     for (int i = 0; i < myPartitionSize; i++) {
         if (inBV->testBit(i) == 0) {
 
@@ -58,10 +73,11 @@ int PartitionManager::getFreeDiskBlock()
 }
 
 /*
- * return 0 for success, -1 otherwise
+ * return 0 for sucess, -1 otherwise
  */
 int PartitionManager::returnDiskBlock(int blknum)
 {
+    /* write the code for deallocating a partition block */
     BitVector* inBV = new BitVector(myPartitionSize);         //bit vector to read in
     int x;
     char buffer[64];  //initialize the array with c's, so you don't get garbage memory in the array.
@@ -80,6 +96,7 @@ int PartitionManager::returnDiskBlock(int blknum)
         return x;
     }
     else {
+        //now need to actually delete addr
         for (int j = 0; j < 64; j++) {
             buffer[j] = '#';
         }
