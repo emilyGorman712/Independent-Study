@@ -23,7 +23,7 @@ int DiskManager::charToInt(int pos, char* buff) {
 //use this to put integers in a buffer
 void DiskManager::intToChar(int pos, int num, char* buff) {
     char tempb[4];
-    sprintf(tempb, "%04d", num);
+    //sprintf(tempb, "%04d", num);
 
     for (int i = 0; i < 4; i++) {
         buff[pos + i] = tempb[i];

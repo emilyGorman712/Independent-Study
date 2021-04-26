@@ -200,7 +200,7 @@ int FileSystem::getsubdir(char* filename, int len) {
 		}
 		i += 2;
 	}
-
+	return -4;
 }
 
 FileSystem::FileSystem(DiskManager* dm, char fileSystemName)
