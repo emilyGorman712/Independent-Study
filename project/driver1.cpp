@@ -15,7 +15,7 @@ using namespace std;
 
 int main()
 {
-	Disk* d = new Disk(300, 64, const_cast<char*>("DISK1"));
+	Disk* d = new Disk(300, const_cast<char*>("DISK1"));
 	DiskPartition* dp = new DiskPartition[3];
 
 	dp[0].partitionName = 'A';
@@ -29,8 +29,8 @@ int main()
 	FileSystem* fs1 = new FileSystem(dm, 'A');
 	Client* c1 = new Client(fs1);
 	int r, l1, l2, f1, f2, f3, f4, f5, i;
-	char buf1[37], buf2[64], buf3[100], buf4[600];
-	char rbuf1[37], rbuf2[64], rbuf3[100], rbuf4[600];
+	char buf1[37], buf2[4096], buf3[100], buf4[600];
+	char rbuf1[37], rbuf2[4096], rbuf3[100], rbuf4[600];
 
 	cout << "driver 1 basic file system tests on fs1\n";
 	cout << "File create tests on fs1\n";
@@ -119,7 +119,7 @@ int main()
 
 
 	for (i = 0; i < 37; i++) buf1[i] = 's';
-	for (i = 0; i < 64; i++) buf2[i] = 'b';
+	for (i = 0; i < 4096; i++) buf2[i] = 'b';
 	for (i = 0; i < 100; i++) buf3[i] = 'K';
 	for (i = 0; i < 600; i++) buf4[i] = 'M';
 

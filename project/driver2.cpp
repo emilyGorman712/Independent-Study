@@ -14,7 +14,7 @@ using namespace std;
 
 int main()
 {
-    Disk* d = new Disk(300, 64, const_cast<char*>("DISK1"));
+    Disk* d = new Disk(300, const_cast<char*>("DISK1"));
     DiskPartition* dp = new DiskPartition[3];
 
     dp[0].partitionName = 'A';
@@ -33,8 +33,8 @@ int main()
     Client* c3 = new Client(fs3);
 
     int i, r, l1, l2, f1, f2, f3, f4, f5;
-    char buf1[37], buf2[64], buf3[100], buf4[600], buf5[1200];
-    char rbuf1[37], rbuf2[64], rbuf3[100], rbuf4[600], rbuf5[1200];
+    char buf1[37], buf2[4096], buf3[100], buf4[600], buf5[1200];
+    char rbuf1[37], rbuf2[4096], rbuf3[100], rbuf4[600], rbuf5[1200];
 
 
     cout << "begin driver 2\n";
@@ -123,14 +123,14 @@ int main()
     cout << "rv from openFile /d w fs3 is " << f4 << (f4 == -1 ? " correct " : " fail") << endl;
 
     for (i = 0; i < 37; i++) buf1[i] = 's';
-    for (i = 0; i < 64; i++) buf2[i] = 'b';
+    for (i = 0; i < 4096; i++) buf2[i] = 'b';
     for (i = 0; i < 100; i++) buf3[i] = 'K';
     for (i = 0; i < 600; i++) buf4[i] = 'M';
 
     r = c1->myFS->writeFile(f1, buf1, 37);
     cout << "rv from writeFile /a fs1 is " << r << (r == 37 ? " correct " : " fail") << endl;
-    r = c2->myFS->writeFile(f2, buf2, 64);
-    cout << "rv from writeFile /a fs2 is " << r << (r == 64 ? " correct " : " fail") << endl;
+    r = c2->myFS->writeFile(f2, buf2, 4096);
+    cout << "rv from writeFile /a fs2 is " << r << (r == 4096 ? " correct " : " fail") << endl;
     r = c3->myFS->writeFile(f3, buf3, 100);
     cout << "rv from writeFile /a fs3 is " << r << (r == 100 ? " correct " : " fail") << endl;
     r = c3->myFS->writeFile(f4, buf4, 600);
@@ -171,7 +171,7 @@ int main()
     cout << endl;
 
     r = c2->myFS->readFile(f2, rbuf3, 85);
-    cout << "rv from readFile /a fs2 is " << r << (r == 64 ? " correct " : " fail") << endl;
+    cout << "rv from readFile /a fs2 is " << r << (r == 4096 ? " correct " : " fail") << endl;
     cout << "Data read is " << endl;
     for (i = 0; i < r; i++) cout << rbuf3[i];
     cout << endl;
@@ -330,10 +330,10 @@ int main()
     r = c2->myFS->seekFile(f2, 32, 1);
     cout << "rv from seekFile is " << r << (r == 0 ? " correct " : " fail") << endl;
 
-    r = c2->myFS->writeFile(f2, buf2, 64);
-    cout << "rv from writeFile /z is " << r << (r == 64 ? " correct " : " fail") << endl;
+    r = c2->myFS->writeFile(f2, buf2, 4096);
+    cout << "rv from writeFile /z is " << r << (r == 4096 ? " correct " : " fail") << endl;
 
-    for (i = 62; i < 1152; i += 64) {
+    for (i = 62; i < 1152; i += 4096) {
         r = c2->myFS->seekFile(f2, i, 1);
         cout << "rv from seekFile is " << r << endl;
         r = c2->myFS->writeFile(f2, buf1, 4);
@@ -350,8 +350,8 @@ int main()
     cout << "rv from seekFile is " << r << endl;
 
     for (int j = 0; j < 19; j++) {
-        r = c2->myFS->readFile(f2, rbuf2, 64);
-        cout << "rv from readFile /z is " << r << (r == 64 ? " correct " : " fail") << endl;
+        r = c2->myFS->readFile(f2, rbuf2, 4096);
+        cout << "rv from readFile /z is " << r << (r == 4096 ? " correct " : " fail") << endl;
         cout << "Data read is " << endl;
         for (i = 0; i < r; i++) cout << rbuf2[i];
         cout << endl;

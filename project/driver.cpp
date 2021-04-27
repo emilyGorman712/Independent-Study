@@ -13,7 +13,7 @@ using namespace std;
 
 int main()
 {
-	Disk* d = new Disk(300, 64, const_cast<char*>("DISK1"));
+	Disk* d = new Disk(300, const_cast<char*>("DISK1"));
 	DiskPartition* dp = new DiskPartition[3];
 
 	dp[0].partitionName = 'A';

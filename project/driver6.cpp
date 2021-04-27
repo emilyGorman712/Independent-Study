@@ -12,31 +12,10 @@
 
 using namespace std;
 
-/*
-  This driver will test the getAttributes() and setAttributes()
-  functions. You need to complete this driver according to the
-  attributes you have implemented in your file system, before
-  testing your program.
-
-
-  Required tests:
-  get and set on the fs1 on a file
-    and on a file that doesn't exist
-    and on a file in a directory in fs1
-    and on a file that doesn't exist in a directory in fs1
-
- fs2, fs3
-  on a file both get and set on both fs2 and fs3
-
-  samples are provided below.  Use them and/or make up your own.
-
-
-*/
-
 int main()
 {
 
-    Disk* d = new Disk(300, 64, const_cast<char*>("DISK1"));
+    Disk* d = new Disk(300, const_cast<char*>("DISK1"));
     DiskPartition* dp = new DiskPartition[3];
 
     dp[0].partitionName = 'A';
@@ -57,8 +36,8 @@ int main()
     Client* c5 = new Client(fs2);
 
     int i, r, l1, l2, f1, f2, f3, f4, f5;
-    char buf1[1], buf2[64], buf3[100], buf4[600];
-    char rbuf1[37], rbuf2[64], rbuf3[100], rbuf4[600];
+    char buf1[1], buf2[4096], buf3[100], buf4[600];
+    char rbuf1[37], rbuf2[4096], rbuf3[100], rbuf4[600];
 
     buf2[0] = 's';
 

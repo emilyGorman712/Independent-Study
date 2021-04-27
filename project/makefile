@@ -2,7 +2,7 @@ CC=g++
 #CFLAGS = -ggdb 
 CFLAGS = 
 
-all: driver1 driver2 driver3 driver4 driver5 driver6
+all: driver driver1 driver2 driver3 driver4 driver5 driver6
 
  
 bitvector.o: bitvector.cpp  bitvector.h
@@ -23,6 +23,9 @@ partitionmanager.o: partitionmanager.cpp  partitionmanager.h
 filesystem.o: filesystem.cpp  filesystem.h
 	$(CC) $(CFLAGS) -c filesystem.cpp
 
+driver: driver.cpp client.h bitvector.o disk.o diskmanager.o partitionmanager.o filesystem.o
+	$(CC)  -o driver driver.cpp bitvector.o disk.o diskmanager.o partitionmanager.o filesystem.o
+
 driver1: driver1.cpp client.h bitvector.o disk.o diskmanager.o partitionmanager.o filesystem.o
 	$(CC) $(CFLAGS)  -o driver1 driver1.cpp bitvector.o disk.o diskmanager.o partitionmanager.o filesystem.o
 
@@ -41,8 +44,5 @@ driver5: driver5.cpp client.h bitvector.o disk.o diskmanager.o partitionmanager.
 driver6: driver6.cpp client.h bitvector.o disk.o diskmanager.o partitionmanager.o filesystem.o
 	$(CC) $(CFLAGS)  -o driver6 driver6.cpp bitvector.o disk.o diskmanager.o partitionmanager.o filesystem.o
 
-driver: driver.cpp client.h bitvector.o disk.o diskmanager.o partitionmanager.o filesystem.o
-	$(CC)  -o driver driver.cpp bitvector.o disk.o diskmanager.o partitionmanager.o filesystem.o
-
 clean: 
-	rm -f bitvector.o disk.o diskmanager.o partitionmanager.o filesystem.o driver1 driver2 driver3 driver4 driver5 driver6 driver bitvector_driver DISK1
+	rm -f bitvector.o disk.o diskmanager.o partitionmanager.o filesystem.o driver driver1 driver2 driver3 driver4 driver5 driver6 bitvector_driver DISK1

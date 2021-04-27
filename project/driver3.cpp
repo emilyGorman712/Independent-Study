@@ -16,7 +16,7 @@ using namespace std;
 
 int main()
 {
-	Disk* d = new Disk(300, 64, const_cast<char*>("DISK1"));
+	Disk* d = new Disk(300, const_cast<char*>("DISK1"));
 	DiskPartition* dp = new DiskPartition[3];
 
 	dp[0].partitionName = 'A';
@@ -39,11 +39,11 @@ int main()
 	Client* c7 = new Client(fs3);
 
 	int i, r, l1, l2, f1, f2, f3, f4, f5;
-	char buf1[37], buf2[64], buf3[100], buf4[600];
-	char rbuf1[37], rbuf2[64], rbuf3[100], rbuf4[600];
+	char buf1[37], buf2[4096], buf3[100], buf4[600];
+	char rbuf1[37], rbuf2[4096], rbuf3[100], rbuf4[600];
 
 	for (i = 0; i < 37; i++) buf1[i] = 'J';
-	for (i = 0; i < 64; i++) buf2[i] = 'S';
+	for (i = 0; i < 4096; i++) buf2[i] = 'S';
 	for (i = 0; i < 100; i++) buf3[i] = 'z';
 	for (i = 0; i < 600; i++) buf4[i] = 'h';
 

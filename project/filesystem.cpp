@@ -26,9 +26,9 @@ int FileSystem::getaddrs(char* inodeBuf) {
 	for (int j = 0; j < 19; j++) Gaddrarr[j] = -1; // fill with -1s
 	int pos = 6;
 	int i = 0;
-	char buff[64];
+	char buff[4096];
 	int x = -1;
-	for (int j = 0; j < 64; j++) buff[j] = '#';
+	for (int j = 0; j < 4096; j++) buff[j] = '#';
 
 	while (inodeBuf[pos] != '#' && pos < 18) {
 		Gaddrarr[i] = myDM->charToInt(pos, inodeBuf);
@@ -43,7 +43,7 @@ int FileSystem::getaddrs(char* inodeBuf) {
 		int r = myDM->readDiskBlock(myfileSystemName, x, buff);
 		//buff should be indir node
 		pos = 0; // start at 0th pos of indir 
-		while (buff[pos] != '#' && pos < 64) {
+		while (buff[pos] != '#' && pos < 4096) {
 			Gaddrarr[i] = myDM->charToInt(pos, buff);
 			pos += 4;
 			i++;
@@ -57,10 +57,10 @@ int FileSystem::getaddrs(char* inodeBuf) {
 int FileSystem::rollbackRoot(char* filename, int fnameLen) {
 
 	char fname = filename[fnameLen - 1];
-	char rootbuf[64];
-	char tempbuf[64];
-	for (int j = 0; j < 64; j++) rootbuf[j] = '#';
-	for (int j = 0; j < 64; j++) tempbuf[j] = '#';
+	char rootbuf[4096];
+	char tempbuf[4096];
+	for (int j = 0; j < 4096; j++) rootbuf[j] = '#';
+	for (int j = 0; j < 4096; j++) tempbuf[j] = '#';
 	int tbufpos = 0;
 	int tbufpos2;
 	int overflowblock = GrootDirAddr;
@@ -106,7 +106,7 @@ int FileSystem::rollbackRoot(char* filename, int fnameLen) {
 			}
 			r = myPM->writeDiskBlock(overflowblock, tempbuf);
 			overflowblock = xy;
-			for (int j = 0; j < 64; j++) tempbuf[j] = '#';
+			for (int j = 0; j < 4096; j++) tempbuf[j] = '#';
 			if (done == true) {
 				bufpos = 6;
 			}
@@ -127,8 +127,8 @@ int FileSystem::filefound(char* filename, int len) {
 	int subdir = getsubdir(filename, len); //working for at least single files 
 	//now just scrape through subdir until you find (or don't find) file
 	if (subdir == -4) return -1;
-	char rootbuf[64];
-	for (int j = 0; j < 64; j++) rootbuf[j] = '#';
+	char rootbuf[4096];
+	for (int j = 0; j < 4096; j++) rootbuf[j] = '#';
 	int i = 1;
 	char curdirname;
 	char fname = filename[len - 1]; //file we're looking for. should already be in the correct dir
@@ -166,8 +166,8 @@ int FileSystem::filefound(char* filename, int len) {
 //assumes /char/char/char validdate b4 sending here
 int FileSystem::getsubdir(char* filename, int len) {
 	if (len == 2) return GrootDirAddr; //just root directory addr
-	char rootbuf[64];
-	for (int j = 0; j < 64; j++) rootbuf[j] = '#';
+	char rootbuf[4096];
+	for (int j = 0; j < 4096; j++) rootbuf[j] = '#';
 	int i = 1;
 	char curdirname;
 
@@ -211,9 +211,9 @@ FileSystem::FileSystem(DiskManager* dm, char fileSystemName)
 	myPM = new PartitionManager(dm, fileSystemName, myfileSystemSize);
 	locker = 1;
 
-	char buffer[64];
+	char buffer[4096];
 	int r;
-	for (int j = 0; j < 64; j++) buffer[j] = '#';
+	for (int j = 0; j < 4096; j++) buffer[j] = '#';
 	r = myPM->readDiskBlock(1, buffer); //1th position should be root dir
 	if (buffer[0] == '#') {
 		cout << "no root dir for part: " << myfileSystemName << " creating root dir..." << endl;
@@ -253,14 +253,14 @@ int FileSystem::createFile(char* filename, int fnameLen)
 
 	char fname = filename[fnameLen - 1];
 
-	char buffer[64];
-	char rootbuf[64];
-	char crapbuf[64];
-	char buff[64];
-	for (int j = 0; j < 64; j++) buff[j] = '#';
-	for (int j = 0; j < 64; j++) buffer[j] = '#';
-	for (int j = 0; j < 64; j++) rootbuf[j] = '#';
-	for (int j = 0; j < 64; j++) crapbuf[j] = '#';
+	char buffer[4096];
+	char rootbuf[4096];
+	char crapbuf[4096];
+	char buff[4096];
+	for (int j = 0; j < 4096; j++) buff[j] = '#';
+	for (int j = 0; j < 4096; j++) buffer[j] = '#';
+	for (int j = 0; j < 4096; j++) rootbuf[j] = '#';
+	for (int j = 0; j < 4096; j++) crapbuf[j] = '#';
 	int pos = 1;
 
 	//subdir is set to addr block of the directory we are writing in
@@ -337,7 +337,7 @@ int FileSystem::createFile(char* filename, int fnameLen)
 				}
 				else {//need to set it up
 					int fdb = myPM->getFreeDiskBlock(); //get free DB and write it to curdir, 
-					for (int j = 0; j < 64; j++) buff[j] = '#';
+					for (int j = 0; j < 4096; j++) buff[j] = '#';
 					r = myPM->writeDiskBlock(fdb, buff); //reserve it
 
 					myDM->intToChar(bufpos, fdb, rootbuf); //put new addr in current dir
@@ -374,8 +374,8 @@ int FileSystem::createDirectory(char* dirname, int dnameLen)
 	//Block pointer: 4 bytes, points to the block of the file/dir
 
 	//root dir first
-	char buff[64];
-	for (int j = 0; j < 64; j++) buff[j] = '#';
+	char buff[4096];
+	for (int j = 0; j < 4096; j++) buff[j] = '#';
 
 	if (dnameLen < 2) return -3;
 	for (int i = 0; i < dnameLen; i++) {
@@ -393,7 +393,7 @@ int FileSystem::createDirectory(char* dirname, int dnameLen)
 		int pos = myPM->getFreeDiskBlock();
 		myDM->intToChar(1, pos, buff);
 		buff[5] = 'D';
-		cout << "Root dir buff is: " << endl; for (int j = 0; j < 64; j++) cout << buff[j]; cout << endl;
+		cout << "Root dir buff is: " << endl; for (int j = 0; j < 4096; j++) cout << buff[j]; cout << endl;
 		GrootDirAddr = pos;
 		cout << "root dir adddr is: " << GrootDirAddr << endl;
 		return myPM->writeDiskBlock(pos, buff);
@@ -404,8 +404,8 @@ int FileSystem::createDirectory(char* dirname, int dnameLen)
 		sleep(100);
 	}
 
-	char rootbuf[64];
-	for (int j = 0; j < 64; j++) rootbuf[j] = '#';
+	char rootbuf[4096];
+	for (int j = 0; j < 4096; j++) rootbuf[j] = '#';
 	int i = 1;
 	char curdirname;
 	char newdirname = dirname[dnameLen - 1];
@@ -436,7 +436,7 @@ int FileSystem::createDirectory(char* dirname, int dnameLen)
 				rootbuf[bufpos + 5] = 'D';
 
 				//reserve new addr
-				for (int j = 0; j < 64; j++) buff[j] = '#';
+				for (int j = 0; j < 4096; j++) buff[j] = '#';
 				r = myPM->writeDiskBlock(fdb, buff);
 				r = myPM->writeDiskBlock(currentdiraddr, rootbuf);
 
@@ -470,7 +470,7 @@ int FileSystem::createDirectory(char* dirname, int dnameLen)
 				}
 				else {//need to set it up
 					int fdb = myPM->getFreeDiskBlock(); //get free DB and write it to curdir, 
-					for (int j = 0; j < 64; j++) buff[j] = '#';
+					for (int j = 0; j < 4096; j++) buff[j] = '#';
 					r = myPM->writeDiskBlock(fdb, buff); //reserve it
 
 					myDM->intToChar(bufpos, fdb, rootbuf); //put new addr in current dir
@@ -502,8 +502,8 @@ int FileSystem::lockFile(char* filename, int fnameLen)
 	int found = -1;
 	int x = 0;
 	int r = -1;
-	char crap[64];
-	for (int j = 0; j < 64; j++) crap[j] = '#';
+	char crap[4096];
+	for (int j = 0; j < 4096; j++) crap[j] = '#';
 
 	if (filefound(filename, fnameLen) == -2) return -4;
 	if (filefound(filename, fnameLen) == -1) return -2;
@@ -555,8 +555,8 @@ int FileSystem::unlockFile(char* filename, int fnameLen, int lockId)
 	if (filefound(filename, fnameLen) == 0) return -2;
 
 
-	char crap[64];
-	for (int j = 0; j < 64; j++) crap[j] = '#';
+	char crap[4096];
+	for (int j = 0; j < 4096; j++) crap[j] = '#';
 
 	//need to unlock every instance of that file in the table
 	for (int i = 1; i < 1000; i++) {
@@ -595,8 +595,8 @@ int FileSystem::openFile(char* filename, int fnameLen, char mode, int lockId)
 { //c, 2, r, -1
 	int found = -2;
 	int f2 = -2;
-	char crap[64];
-	for (int j = 0; j < 64; j++) crap[j] = '#';
+	char crap[4096];
+	for (int j = 0; j < 4096; j++) crap[j] = '#';
 
 	for (int i = 1; i < 1000; i++) {
 		if (fileTable[i].filename == filename) {
@@ -714,8 +714,8 @@ int FileSystem::readFile(int fileDesc, char* data, int len)
 	if (len < 0) return -2;
 	if (fileTable[fileDesc].mode != 'r' && fileTable[fileDesc].mode != 'm') return -3;
 	//intial tests passed, do real things now
-	char fileBuf[64];
-	char inodeBuf[64];
+	char fileBuf[4096];
+	char inodeBuf[4096];
 	char* filename = fileTable[fileDesc].filename;
 	int r, addrnumb;
 	int pos = 1;
@@ -723,8 +723,8 @@ int FileSystem::readFile(int fileDesc, char* data, int len)
 	int x2 = -22;
 	int count = 0;
 	int rwptr = 0;
-	for (int j = 0; j < 64; j++) fileBuf[j] = '#';
-	for (int j = 0; j < 64; j++) inodeBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) fileBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) inodeBuf[j] = '#';
 
 	//x is filename addr 
 	//inodeBuf is file inode
@@ -744,7 +744,7 @@ int FileSystem::readFile(int fileDesc, char* data, int len)
 		r = myDM->readDiskBlock(myfileSystemName, Gaddrarr[i], fileBuf);
 		//fileBuf is now the buffer at an addr for the file 
 		int j = 0;
-		while (fileBuf[j] != '#' && j < 64) {//read to the end of the buffer
+		while (fileBuf[j] != '#' && j < 4096) {//read to the end of the buffer
 			if (filewalker >= rwptr) {//gotta get to the rwptr first
 				if (readcount >= len) {
 					fileTable[fileDesc].rw = rwptr + readcount;
@@ -779,8 +779,8 @@ int FileSystem::writeFile(int fileDesc, char* data, int len)
 	if (fileTable[fileDesc].mode != 'w' && fileTable[fileDesc].mode != 'm') return -3;
 	//intial tests passed, do real things now
 
-	char adrBuf[64];
-	char inodeBuf[64];
+	char adrBuf[4096];
+	char inodeBuf[4096];
 	char* filename = fileTable[fileDesc].filename;
 	int r, addrnumb;
 	int pos = 1;
@@ -788,8 +788,8 @@ int FileSystem::writeFile(int fileDesc, char* data, int len)
 	int x2 = -22;
 	int count = 0;
 	int rwptr = 0;
-	for (int j = 0; j < 64; j++) adrBuf[j] = '#';
-	for (int j = 0; j < 64; j++) inodeBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) adrBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) inodeBuf[j] = '#';
 
 	//x is filename addr 
 	//inodeBuf is file inode
@@ -806,7 +806,7 @@ int FileSystem::writeFile(int fileDesc, char* data, int len)
 	//write everything from rwptr to rwptr + len into data
 
 	while (true) {
-		for (int j = 0; j < 64; j++) adrBuf[j] = '#';
+		for (int j = 0; j < 4096; j++) adrBuf[j] = '#';
 		//pos is get the block addr from the file/indir inode
 		pos = myDM->charToInt(addrnumb, inodeBuf);
 		if (addrnumb == 2) {//if we are looking at the size
@@ -825,7 +825,7 @@ int FileSystem::writeFile(int fileDesc, char* data, int len)
 			//pos is the addr of the next block we are writing at
 			r = myPM->readDiskBlock(pos, adrBuf);
 
-			for (int i = 0; i < 64; i++) {
+			for (int i = 0; i < 4096; i++) {
 				if (start >= rwptr) {
 					adrBuf[i] = data[dataStart];
 					dataStart++;
@@ -850,7 +850,7 @@ int FileSystem::writeFile(int fileDesc, char* data, int len)
 
 					r = myPM->writeDiskBlock(x, inodeBuf);
 
-					for (int j = 0; j < 64; j++) adrBuf[j] = '#';
+					for (int j = 0; j < 4096; j++) adrBuf[j] = '#';
 					x = pos; //x is now the indir addr
 					r = myPM->writeDiskBlock(pos, adrBuf); //writes crap at the indir addr
 
@@ -876,7 +876,7 @@ int FileSystem::writeFile(int fileDesc, char* data, int len)
 			}
 
 			r = myPM->readDiskBlock(pos, adrBuf);
-			for (int i = 0; i < 64; i++) {
+			for (int i = 0; i < 4096; i++) {
 				if (start >= rwptr) {
 					adrBuf[i] = data[dataStart];
 					dataStart++;
@@ -907,13 +907,13 @@ int FileSystem::appendFile(int fileDesc, char* data, int len)
 	if (len < 0) return -2;
 	if (fileTable[fileDesc].mode != 'w' && fileTable[fileDesc].mode != 'm') return -3;
 
-	char inodeBuf[64];
+	char inodeBuf[4096];
 	int r, x, filesize;
 	int pos = 0;
 	int rwptr = fileTable[fileDesc].rw;
 	char* filename = fileTable[fileDesc].filename;
 	//need to get file size 
-	for (int j = 0; j < 64; j++) inodeBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) inodeBuf[j] = '#';
 
 	//x is filename addr 
 	//inodeBuf is file inode
@@ -938,13 +938,13 @@ int FileSystem::seekFile(int fileDesc, int offset, int flag)
 {
 	if (fileTable[fileDesc].filename[0] == '#') return -1;
 	if (offset < 0 && flag != 0) return -1;
-	char inodeBuf[64];
+	char inodeBuf[4096];
 	int r, x, filesize;
 	int pos = 0;
 	int rwptr = fileTable[fileDesc].rw;
 	char* filename = fileTable[fileDesc].filename;
 	//need to get file size 
-	for (int j = 0; j < 64; j++) inodeBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) inodeBuf[j] = '#';
 
 	//x is filename addr 
 	//inodeBuf is file inode
@@ -1000,11 +1000,11 @@ int FileSystem::renameFile(char* filename1, int fnameLen1, char* filename2, int 
 	if (filefound(filename1, fnameLen1) == -1) return -2;
 	//need to get file addr, inodebuff, and filedesc
 
-	char inodeBuf[64];
+	char inodeBuf[4096];
 	int fileaddr;
 	int x, pos, r;
 	int found = -1;
-	for (int j = 0; j < 64; j++) inodeBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) inodeBuf[j] = '#';
 	//x is filename addr 
 	//inodeBuf is file inode
 
@@ -1037,8 +1037,8 @@ int FileSystem::renameFile(char* filename1, int fnameLen1, char* filename2, int 
 	}
 	//change on directory system as well 
 	int subdir = getsubdir(filename1, fnameLen1);
-	char rootbuf[64];
-	for (int j = 0; j < 64; j++) rootbuf[j] = '#';
+	char rootbuf[4096];
+	for (int j = 0; j < 4096; j++) rootbuf[j] = '#';
 	//now just scrape through subdir until you find (or don't find) file, should find it though
 	char fname = filename1[fnameLen1 - 1];
 	char fname2 = filename2[fnameLen2 - 1];
@@ -1087,11 +1087,11 @@ int FileSystem::deleteFile(char* filename, int fnameLen)
 
 	if (filefound(filename, fnameLen) == -1) return -1;
 
-	char inodeBuf[64];
+	char inodeBuf[4096];
 	int fileaddr;
 	int x, pos, r;
 	int found = -1;
-	for (int j = 0; j < 64; j++) inodeBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) inodeBuf[j] = '#';
 	r = myPM->readDiskBlock(pos, inodeBuf);
 	pos = 0;
 
@@ -1118,9 +1118,9 @@ int FileSystem::deleteFile(char* filename, int fnameLen)
 	for (int j = 0; j < 19; j++) Saddrarr[j] = -1; // fill with -1s
 	pos = 6;
 	int i = 0;
-	char buff[64];
+	char buff[4096];
 	x = -1;
-	for (int j = 0; j < 64; j++) buff[j] = '#';
+	for (int j = 0; j < 4096; j++) buff[j] = '#';
 
 	while (inodeBuf[pos] != '#' && pos < 18) {
 		Saddrarr[i] = myDM->charToInt(pos, inodeBuf);
@@ -1135,17 +1135,17 @@ int FileSystem::deleteFile(char* filename, int fnameLen)
 		int r = myDM->readDiskBlock(myfileSystemName, x, buff);
 		//buff should be indir node
 		pos = 0; // start at 0th pos of indir 
-		while (buff[pos] != '#' && pos < 64) {
+		while (buff[pos] != '#' && pos < 4096) {
 			Saddrarr[i] = myDM->charToInt(pos, buff);
 			pos += 4;
 			i++;
 		}
 	}
 	int indirblock = x;
-	char rootbuf[64];
-	char testbuf[64];
-	for (int j = 0; j < 64; j++) testbuf[j] = '#';
-	for (int j = 0; j < 64; j++) rootbuf[j] = '#';
+	char rootbuf[4096];
+	char testbuf[4096];
+	for (int j = 0; j < 4096; j++) testbuf[j] = '#';
+	for (int j = 0; j < 4096; j++) rootbuf[j] = '#';
 	//indirblock = getaddrs(inodeBuf);
 
 	//now delete every addr block in Gaddr
@@ -1205,10 +1205,10 @@ int FileSystem::deleteDirectory(char* dirname, int dnameLen)
 {
 	int subdir = getsubdir(dirname, dnameLen);
 	int r, diraddr;
-	char rootbuf[64];
-	char dirbuf[64];
-	for (int j = 0; j < 64; j++) rootbuf[j] = '#';
-	for (int j = 0; j < 64; j++) dirbuf[j] = '#';
+	char rootbuf[4096];
+	char dirbuf[4096];
+	for (int j = 0; j < 4096; j++) rootbuf[j] = '#';
+	for (int j = 0; j < 4096; j++) dirbuf[j] = '#';
 	//now just scrape through subdir until you find (or don't find) file, should find it though
 	char mydirname = dirname[dnameLen - 1];
 
@@ -1241,8 +1241,6 @@ int FileSystem::deleteDirectory(char* dirname, int dnameLen)
 	if (dirbuf[0] != '#') return-2;
 	else {
 
-		//set flag to X and call emily/Ryans cleanup 
-
 		//need to 'del' from directories
 		//get current dir of file 
 		int direc = getsubdir(dirname, dnameLen);
@@ -1272,9 +1270,9 @@ int FileSystem::deleteDirectory(char* dirname, int dnameLen)
 }
 int FileSystem::getAttribute(char* filename, int fnameLen, char* girth)
 {
-	char inodeBuf[64];
+	char inodeBuf[4096];
 	int x, pos, r;
-	for (int j = 0; j < 64; j++) inodeBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) inodeBuf[j] = '#';
 
 	pos = 0;
 
@@ -1290,9 +1288,9 @@ int FileSystem::getAttribute(char* filename, int fnameLen, char* girth)
 //returns 0 on good
 int FileSystem::setAttribute(char* filename, int fnameLen, char girth)
 {
-	char inodeBuf[64];
+	char inodeBuf[4096];
 	int x, pos, r;
-	for (int j = 0; j < 64; j++) inodeBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) inodeBuf[j] = '#';
 
 	pos = 0;
 
@@ -1301,10 +1299,10 @@ int FileSystem::setAttribute(char* filename, int fnameLen, char girth)
 	x = filefound(filename, fnameLen);
 	r = myDM->readDiskBlock(myfileSystemName, x, inodeBuf);
 
-	cout << "inodeBuf is: "; for (int j = 0; j < 64; j++) cout << inodeBuf[j]; cout << endl;
+	cout << "inodeBuf is: "; for (int j = 0; j < 4096; j++) cout << inodeBuf[j]; cout << endl;
 
 	inodeBuf[23] = girth;
-	cout << "inodeBuf is: "; for (int j = 0; j < 64; j++) cout << inodeBuf[j]; cout << endl;
+	cout << "inodeBuf is: "; for (int j = 0; j < 4096; j++) cout << inodeBuf[j]; cout << endl;
 	return myPM->writeDiskBlock(x, inodeBuf);
 
 	return -1;
@@ -1312,9 +1310,9 @@ int FileSystem::setAttribute(char* filename, int fnameLen, char girth)
 
 int FileSystem::getAttribute2(char* filename, int fnameLen)
 {
-	char inodeBuf[64];
+	char inodeBuf[4096];
 	int x, pos, r;
-	for (int j = 0; j < 64; j++) inodeBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) inodeBuf[j] = '#';
 
 	pos = 0;
 
@@ -1330,9 +1328,9 @@ int FileSystem::getAttribute2(char* filename, int fnameLen)
 //returns 0 on good
 int FileSystem::setAttribute2(char* filename, int fnameLen, int shaft)
 {
-	char inodeBuf[64];
+	char inodeBuf[4096];
 	int x, pos, r;
-	for (int j = 0; j < 64; j++) inodeBuf[j] = '#';
+	for (int j = 0; j < 4096; j++) inodeBuf[j] = '#';
 
 	pos = 0;
 
@@ -1341,9 +1339,9 @@ int FileSystem::setAttribute2(char* filename, int fnameLen, int shaft)
 	x = filefound(filename, fnameLen);
 	r = myDM->readDiskBlock(myfileSystemName, x, inodeBuf);
 
-	cout << "inodeBuf is: "; for (int j = 0; j < 64; j++) cout << inodeBuf[j]; cout << endl;
+	cout << "inodeBuf is: "; for (int j = 0; j < 4096; j++) cout << inodeBuf[j]; cout << endl;
 	myDM->intToChar(24, shaft, inodeBuf);
-	cout << "inodeBuf is: "; for (int j = 0; j < 64; j++) cout << inodeBuf[j]; cout << endl;
+	cout << "inodeBuf is: "; for (int j = 0; j < 4096; j++) cout << inodeBuf[j]; cout << endl;
 	return myPM->writeDiskBlock(x, inodeBuf);
 
 	return -1;

@@ -27,8 +27,8 @@ PartitionManager::PartitionManager(DiskManager* dm, char partitionname, int part
     myPartitionSize = myDM->getPartitionSize(myPartitionName);
     BitVector* dmBV = new BitVector(myPartitionSize);
 
-    char tempbuffer[64];
-    for (int j = 0; j < 64; j++) {
+    char tempbuffer[4096];
+    for (int j = 0; j < 4096; j++) {
         tempbuffer[j] = 'c';
     }
 
@@ -55,8 +55,8 @@ int PartitionManager::getFreeDiskBlock()
     /* write the code for allocating a partition block */
     BitVector* inBV = new BitVector(myPartitionSize);     //bit vector to read in
     int x;
-    char buffer[64];  //initialize the array with c's, so you don't get garbage memory in the array.
-    for (int j = 0; j < 64; j++) {
+    char buffer[4096];  //initialize the array with c's, so you don't get garbage memory in the array.
+    for (int j = 0; j < 4096; j++) {
         buffer[j] = 'c';
     }
 
@@ -80,8 +80,8 @@ int PartitionManager::returnDiskBlock(int blknum)
     /* write the code for deallocating a partition block */
     BitVector* inBV = new BitVector(myPartitionSize);         //bit vector to read in
     int x;
-    char buffer[64];  //initialize the array with c's, so you don't get garbage memory in the array.
-    for (int j = 0; j < 64; j++) {
+    char buffer[4096];  //initialize the array with c's, so you don't get garbage memory in the array.
+    for (int j = 0; j < 4096; j++) {
         buffer[j] = 'c';
     }
 
@@ -97,7 +97,7 @@ int PartitionManager::returnDiskBlock(int blknum)
     }
     else {
         //now need to actually delete addr
-        for (int j = 0; j < 64; j++) {
+        for (int j = 0; j < 4096; j++) {
             buffer[j] = '#';
         }
         return myDM->writeDiskBlock(myPartitionName, blknum, buffer);
@@ -115,8 +115,8 @@ int PartitionManager::writeDiskBlock(int blknum, char* blkdata)
 {
     BitVector* inBV = new BitVector(myPartitionSize);
     int x;
-    char buffer[64];
-    for (int j = 0; j < 64; j++) {
+    char buffer[4096];
+    for (int j = 0; j < 4096; j++) {
         buffer[j] = 'c';
     }
     myDM->readDiskBlock(myPartitionName, 0, buffer);

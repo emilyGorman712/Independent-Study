@@ -1,0 +1,7 @@
+run in unbuntu terminal
+cd to project folder
+makefile exists so you just need to type make all
+then ./ a specific driver to run
+i.e. ./driver to run driver
+run the drivers in order
+make clean to clean up

@@ -38,7 +38,7 @@ DiskManager::DiskManager(Disk* d, int partcount, DiskPartition* dp)
     partCount = partcount;
     int r = myDisk->initDisk();
     int r2;
-    char buffer[64];
+    char buffer[4096];
 
     r2 = myDisk->readDiskBlock(0, buffer);
 
@@ -177,10 +177,10 @@ int DiskManager::getPartitionSize(char partitionname)
 
 void DiskManager::setSuperBlock() {
     int starter = 1;
-    char buffer[64];
+    char buffer[4096];
     int r;
 
-    for (int j = 0; j < 64; j++) buffer[j] = '#';
+    for (int j = 0; j < 4096; j++) buffer[j] = '#';
 
     int position = 0;
 

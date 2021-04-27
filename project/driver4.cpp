@@ -13,7 +13,7 @@ using namespace std;
 
 int main()
 {
-	Disk* d = new Disk(300, 64, const_cast<char*>("DISK1"));
+	Disk* d = new Disk(300, const_cast<char*>("DISK1"));
 	DiskPartition* dp = new DiskPartition[3];
 
 	dp[0].partitionName = 'A';
@@ -35,11 +35,11 @@ int main()
 
 	int i, r, l1, l2, f1, f2, f3, f4, f5;
 
-	char buf1[37], buf2[64], buf3[100], buf4[600];
-	char rbuf1[37], rbuf2[64], rbuf3[100], rbuf4[600];
+	char buf1[37], buf2[4096], buf3[100], buf4[600];
+	char rbuf1[37], rbuf2[4096], rbuf3[100], rbuf4[600];
 
 	for (i = 0; i < 37; i++) buf1[i] = 'j';
-	for (i = 0; i < 64; i++) buf2[i] = 'i';
+	for (i = 0; i < 4096; i++) buf2[i] = 'i';
 	for (i = 0; i < 100; i++) buf3[i] = 'm';
 	for (i = 0; i < 600; i++) buf4[i] = 'W';
 
@@ -149,7 +149,7 @@ int main()
 	r = c5->myFS->seekFile(f2, 0, -1);
 	cout << "rv from seekFile /e/b/a f2 is " << r << (r == 0 ? " Correct rw set to 0" : " fail") << endl;
 
-	r = c5->myFS->readFile(f2, rbuf2, 64);
+	r = c5->myFS->readFile(f2, rbuf2, 4096);
 	cout << "rv from readFile /e/b/a fs2 is " << r << (r == 29 ? " Correct " : " fail") << endl;
 	cout << "Data read is " << endl;
 	for (i = 0; i < r; i++) cout << rbuf2[i];
@@ -157,7 +157,7 @@ int main()
 
 	r = c3->myFS->seekFile(f3, 0, -1);
 	cout << "rv from seekFile /e/b/a f3 is " << r << (r == 0 ? " Correct rw set to 0" : " fail") << endl;
-	r = c3->myFS->readFile(f3, rbuf2, 64);
+	r = c3->myFS->readFile(f3, rbuf2, 4096);
 	cout << "rv from readFile /e/b/a fs3 is " << r << (r == 25 ? " Correct " : " fail") << endl;
 	cout << "Data read is " << endl;
 	for (i = 0; i < r; i++) cout << rbuf2[i];
