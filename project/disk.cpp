@@ -21,18 +21,23 @@ Disk::~Disk()
 
 int Disk::initDisk()
 {
-  fstream f(currFileName, ios::in);
-  if (!f) {
-    f.open(currFileName, ios::out);
-    if (!f) {
+  fstream currf(currFileName, ios::in);
+  fstream copyf(copyFileName, ios::in);
+  if (!currf || !copyf) {
+    currf.open(currFileName, ios::out);
+    copyf.open(copyFileName, ios::out);
+    if (!currf || !copyf) {
       cerr << "Error: Cannot create disk file" << endl;
       return(-1);
     }
-    for (int i = 0; i < diskSize; i++) f.put('#');
-    f.close();
+    for (int i = 0; i < diskSize; i++) currf.put('#');
+    for (int i = 0; i < diskSize; i++) copyf.put('#');
+    currf.close();
+    copyf.close();
     return(1);
   }
-  f.close();
+  currf.close();
+  copyf.close();
   return (0);
 }
 
